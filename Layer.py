@@ -3,16 +3,16 @@ from dbm.dumb import error
 from Neuron import Neuron
 class Layer:
     __slots__ = ['neurons','next_layer']
-    def __init__(self,layers:[int],weights_num:int):
+    def __init__(self,layers:[int],weights_num:int,activation_func:str):
         if isinstance(layers,int):
             layers=[layers]
 
-        self.neurons=[Neuron(weights_num) for _ in range(layers[0])]
+        self.neurons=[Neuron(weights_num,activation_func) for _ in range(layers[0])]
 
         if len(layers)==1:
             self.next_layer=None #if it's output layer
         else:
-            self.next_layer=Layer(layers[1:],len(self.neurons))
+            self.next_layer=Layer(layers[1:],len(self.neurons),activation_func)
 
     def train(self,data:[float],y:[float]) -> ([float],[[float]]):
         result=[neuron.calculate(data) for neuron in self.neurons] #must be calculated anyway to give values to neurons
@@ -22,7 +22,7 @@ class Layer:
             returning_weights.append(([neuron.weights[i] for neuron in self.neurons]))
 
         if self.next_layer==None:
-            local_error:[float] = [(answer-neuron.value)*neuron.derivative_sigmoid() for neuron,answer in zip(self.neurons,y)]
+            local_error:[float] = [(answer-neuron.value)*neuron.derivative_func() for neuron,answer in zip(self.neurons,y)]
             [neuron.adjust_weights(err,data) for neuron,err in zip(self.neurons,local_error)]
             return local_error,returning_weights
 
@@ -42,7 +42,7 @@ class Layer:
         result=[]
         for i in range(len(err)):
             s=sum([err[i]*weights[i][k] for k in range(len(weights[i]))])
-            result+=[s*self.neurons[i].derivative_sigmoid()]
+            result+=[s*self.neurons[i].derivative_func()]
         return result
 
 

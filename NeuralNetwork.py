@@ -1,9 +1,9 @@
 from Layer import Layer
 class NeuralNetwork:
-    __slots__ = ['inputs','outputs','layers','first_layer']
-    def __init__(self,inputs:int,outputs:int,hidden_layers:[int]):# every hidden_layers's  int is a number of neurons in layer
+    __slots__ = ['inputs','outputs','layers','first_layer',"activation_func"]
+    def __init__(self,inputs:int,outputs:int,hidden_layers:[int],activation_func:str="ReLU"):# every hidden_layers's  int is a number of neurons in layer
         self.layers:[int]=hidden_layers+[outputs]
-        self.first_layer=Layer(self.layers,inputs)
+        self.first_layer=Layer(self.layers,inputs,activation_func)
 
 
 

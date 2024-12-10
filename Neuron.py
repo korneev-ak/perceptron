@@ -3,26 +3,35 @@ from sre_constants import error
 
 import math
 class Neuron:
-    __slots__ = ['weights','value']
-    def __init__(self,weights_num:int):
+    __slots__ = ['weights','value','activation_func','derivative_func']
+    derivativeFuncs = {
+        "ReLU" : "derivative_ReLU",
+        "sigmoid" : "derivative_sigmoid"
+    }
+    def __init__(self,weights_num:int,activation_func:str):
+        self.activation_func=getattr(self,activation_func)
+        self.derivative_func=getattr(self,Neuron.derivativeFuncs[activation_func])
         self.weights = []
-        self.value:int=0
+        self.value:float=0
         for i in range(weights_num):
             self.weights.append(random())
 
-    def activation(self,value):
-        #self.value=1 / (1 + math.exp(-value))
-        self.value=max(value,0)
-        return self.value
+    def ReLU(self,value):
+        return max(0,value)
 
+    def derivative_ReLU(self):
+        return self.value>0
 
+    def sigmoid(self,value):
+        return 1 / (1 + math.exp(-value))
 
     def derivative_sigmoid(self) -> float:
         #return self.value * (1 - self.value)
-        return self.value>0
+        return self.value * (1 - self.value)
 
     def calculate(self,values:[float]) -> float:
-        return self.activation(self.__calc_sum(values))
+        self.value = self.activation_func(self.__calc_sum(values))
+        return self.value
 
     def __calc_sum(self,values:[float]) -> float:
         if len(values) != len(self.weights):
